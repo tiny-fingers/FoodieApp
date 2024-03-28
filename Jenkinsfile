@@ -46,5 +46,18 @@ pipeline {
                 }
             }
         }
+        stage('Clean up') {
+            environment {
+                SSH_KEY = 'AWS_CREDENTIALS'
+                SSH_USER = 'ubuntu'
+                EC2_HOST = '52.47.159.117'
+            }
+            steps {
+                sshagent([SSH_KEY]) {
+                    sh 'ssh ${SSH_USER}@${EC2_HOST} docker image prune -f'
+                    sh 'ssh ${SSH_USER}@${EC2_HOST} docker container prune -f'
+                }
+            }
+        }
     }
 }
