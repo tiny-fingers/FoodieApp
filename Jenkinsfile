@@ -42,22 +42,23 @@ pipeline {
             }
             steps {
                 sshagent([SSH_KEY]) {
+                    sh 'ssh ${SSH_USER}@${EC2_HOST} docker pull ${IMAGE_NAME}'
                     sh 'ssh ${SSH_USER}@${EC2_HOST} docker run --env-file ${ENV_FILE_LOCATION} -d ${IMAGE_NAME}'
                 }
             }
         }
-        stage('Clean up') {
-            environment {
-                SSH_KEY = 'AWS_CREDENTIALS'
-                SSH_USER = 'ubuntu'
-                EC2_HOST = '52.47.159.117'
-            }
-            steps {
-                sshagent([SSH_KEY]) {
-                    sh 'ssh ${SSH_USER}@${EC2_HOST} docker image prune -f'
-                    sh 'ssh ${SSH_USER}@${EC2_HOST} docker container prune -f'
-                }
-            }
-        }
+//         stage('Clean up') {
+//             environment {
+//                 SSH_KEY = 'AWS_CREDENTIALS'
+//                 SSH_USER = 'ubuntu'
+//                 EC2_HOST = '52.47.159.117'
+//             }
+//             steps {
+//                 sshagent([SSH_KEY]) {
+//                     sh 'ssh ${SSH_USER}@${EC2_HOST} docker image prune -f'
+//                     sh 'ssh ${SSH_USER}@${EC2_HOST} docker container prune -f'
+//                 }
+//             }
+//         }
     }
 }
