@@ -1,16 +1,23 @@
-FROM openjdk:17
-
+FROM maven:3.8.5-openjdk-17 AS builder
+LABEL authors="tinyfingers"
 LABEL maintainer="tinyfingers"
 
 WORKDIR /app
+COPY pom.xml .
+COPY src ./src
+RUN mvn clean package -DskipTests
 
-COPY target/FoodieApp-0.0.1-SNAPSHOT.jar /app/FoodieApp-0.0.1-SNAPSHOT.jar
+FROM openjdk:22-ea-17-slim
+
+WORKDIR /app
 
 ENV DATABASE_URL=${DATABASE_URL}
 ENV DATABASE_USER=${DATABASE_USER}
 ENV DATABASE_PASSWORD=${DATABASE_PASSWORD}
+ENV SERVER_PORT=${SERVER_PORT}
 
-EXPOSE 8080
+COPY --from=builder /app/target/*.jar app.jar
 
-#CMD ["sh", "-cp", "java -jar -DDATABASE_URL=${DATABASE_URL} -DDATABSE_USER=${DATABASE_USER} -DDATABASE_PASSWORD=${DATABASE_PASSWORD} FoodieApp-0.0.1-SNAPSHOT.jar"]
-CMD ["sh", "-cp", "java -jar FoodieApp-0.0.1-SNAPSHOT.jar"]
+EXPOSE ${SERVER_PORT}
+
+ENTRYPOINT ["java","-jar","/app/app.jar"]
