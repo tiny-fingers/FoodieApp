@@ -16,6 +16,11 @@ pipeline {
                     label 'foodie-app'
                 }
             }
+            stage('Test') {
+                steps {
+                    sh 'java --version'
+                }
+            }
         }
     }
 }
