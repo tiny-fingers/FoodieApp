@@ -43,6 +43,7 @@ pipeline {
             steps {
                 sshagent([SSH_KEY]) {
                     sh 'ssh ${SSH_USER}@${EC2_HOST} docker pull ${IMAGE_NAME}'
+                    sh 'ssh ${SSH_USER}@${EC2_HOST} docker rename foodie-app old-foodie-app'
                     sh 'ssh ${SSH_USER}@${EC2_HOST} docker run --name foodie-app --env-file ${ENV_FILE_LOCATION} -p 8090:8090 -d ${IMAGE_NAME}'
                 }
             }
@@ -55,6 +56,8 @@ pipeline {
             }
             steps {
                 sshagent([SSH_KEY]) {
+                    sh 'ssh ${SSH_USER}@${EC2_HOST} docker stop old-foodie-app'
+                    sh 'ssh ${SSH_USER}@${EC2_HOST} docker rm old-foodie-app'
                     sh 'ssh ${SSH_USER}@${EC2_HOST} docker container prune -f'
                     sh 'ssh ${SSH_USER}@${EC2_HOST} docker image prune -f'
                 }
