@@ -1,12 +1,20 @@
 pipeline {
-    agent any
+    agent none
     tools {
         maven 'maven'
     }
     stages {
-        stage('build') {
+        stage('mvn package') {
+            agent any
             steps {
                 sh 'mvn clean package -DskipTests'
+            }
+        }
+        stage('build docker') {
+            agent {
+                dockerfile {
+                    label 'foodie-app'
+                }
             }
         }
     }
