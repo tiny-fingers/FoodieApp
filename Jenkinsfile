@@ -11,7 +11,7 @@ pipeline {
         }
         stage('build docker') {
             steps {
-                sh 'docker buildx build --platform linux/amd64,linux/arm64 -t foodie-app .'
+                sh 'docker build -t foodie-app .'
                 sh 'docker tag foodie-app:latest tinyfingersdocker/foodie-app:latest'
             }
         }
