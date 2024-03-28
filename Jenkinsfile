@@ -5,13 +5,13 @@ pipeline {
      }
     stages {
         stage('Login to dockerhub') {
-          steps {
-            sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
-          }
+            steps {
+                sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
+            }
         }
         stage('build docker') {
             steps {
-                sh 'docker build -t foodie-app .'
+                sh 'docker buildx build --platform linux/amd64,linux/arm64 -t foodie-app .'
                 sh 'docker tag foodie-app:latest tinyfingersdocker/foodie-app:latest'
             }
         }
