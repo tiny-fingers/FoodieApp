@@ -20,5 +20,31 @@ pipeline {
                 sh 'docker push tinyfingersdocker/foodie-app:latest'
             }
         }
+        stage ('Login to EC2') {
+            environment {
+                SSH_KEY = 'AWS_CREDENTIALS'
+                SSH_USER = 'ubuntu'
+                EC2_HOST = '52.47.159.117'
+            }
+            steps {
+                sshagent([SSH_KEY]) {
+                    sh "ssh ${SSH_USER}@${EC2_HOST} 'echo CONNECTED SUCCESS'"
+                }
+            }
+        }
+        stage('Deploy') {
+            environment {
+                IMAGE_NAME='tinyfingersdocker/foodie-app:latest'
+                ENV_FILE_LOCATION='.env'
+                SSH_KEY = 'AWS_CREDENTIALS'
+                SSH_USER = 'ubuntu'
+                EC2_HOST = '52.47.159.117'
+            }
+            steps {
+                sshagent([SSH_KEY]) {
+                    sh 'ssh ${SSH_USER}@${EC2_HOST} docker run --env-file ${ENV_FILE_LOCATION} -d ${IMAGE_NAME}'
+                }
+            }
+        }
     }
 }
