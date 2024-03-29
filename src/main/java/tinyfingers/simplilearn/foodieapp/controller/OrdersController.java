@@ -2,15 +2,11 @@ package tinyfingers.simplilearn.foodieapp.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+import tinyfingers.simplilearn.foodieapp.exception.ResourceNotFoundException;
 import tinyfingers.simplilearn.foodieapp.mapper.RequestResponseMapper;
 import tinyfingers.simplilearn.foodieapp.model.api.CreateOrderRequest;
 import tinyfingers.simplilearn.foodieapp.model.api.CreateOrderResponse;
@@ -21,10 +17,10 @@ import tinyfingers.simplilearn.foodieapp.service.externalapi.RestaurantApiServic
 
 import java.util.List;
 
-@Controller
 @RequiredArgsConstructor
 @RequestMapping("/api")
 @Slf4j
+@RestController
 public class OrdersController {
   private final OrderService orderService;
   private final RestaurantApiService restaurantApiService;
@@ -56,14 +52,13 @@ public class OrdersController {
   }
 
   @PutMapping("/orders/{id}/cancel")
-  public ResponseEntity cancelOrder(@RequestParam String userId, @PathVariable Long id) {
+  @ResponseStatus(HttpStatus.OK)
+  public void cancelOrder(@RequestParam String userId, @PathVariable Long id) {
     log.info("Cancelling order {}", id);
-
     try {
       orderService.cancelOrder(userId, id);
-      return ResponseEntity.ok().build();
     } catch (Exception e) {
-      return ResponseEntity.notFound().build();
+      throw new ResourceNotFoundException("Order not found");
     }
   }
 }

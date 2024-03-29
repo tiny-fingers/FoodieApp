@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import tinyfingers.simplilearn.foodieapp.mapper.RestaurantMapper;
 import tinyfingers.simplilearn.foodieapp.model.api.RestaurantDetails;
 import tinyfingers.simplilearn.foodieapp.model.api.RestaurantMenu;
@@ -17,7 +18,7 @@ import tinyfingers.simplilearn.foodieapp.service.externalapi.model.Restaurant;
 
 import java.util.List;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
 @Slf4j
