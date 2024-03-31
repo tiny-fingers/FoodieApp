@@ -44,8 +44,8 @@ public class CartController {
 
     val cart = new Cart();
     val cartItems = List.of(
-            new CartItem(1L, 1, "Pizza"),
-            new CartItem(2L, 2, "Coca-Cola"));
+            new CartItem(1L, 1, "Pizza", 6.90),
+            new CartItem(2L, 2, "Coca-Cola", 2.50));
     cart.setCardItems(cartItems);
     cart.setUserId("user1");
 

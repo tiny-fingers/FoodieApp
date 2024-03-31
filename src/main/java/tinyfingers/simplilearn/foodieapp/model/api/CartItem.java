@@ -13,4 +13,5 @@ public class CartItem {
   private Long id;
   private Integer quantity;
   private String name;
+  private double unitPrice;
 }

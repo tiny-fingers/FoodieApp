@@ -4,6 +4,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.stereotype.Component;
 import tinyfingers.simplilearn.foodieapp.model.api.RestaurantDetails;
+import tinyfingers.simplilearn.foodieapp.model.api.RestaurantDto;
 import tinyfingers.simplilearn.foodieapp.model.api.RestaurantMenu;
 import tinyfingers.simplilearn.foodieapp.service.externalapi.model.Restaurant;
 
@@ -15,4 +16,16 @@ public interface RestaurantMapper {
 
   @Mapping(source = "restaurantName", target = "name")
   RestaurantDetails toDetails(Restaurant restaurant);
+
+  default RestaurantDto toRestaurantDto(Restaurant restaurant) {
+    RestaurantDto restaurantDto = new RestaurantDto();
+    restaurantDto.setRestaurantId(restaurant.getRestaurantId());
+
+    restaurantDto.setMenu(restaurant.getSellable());
+
+    RestaurantDetails restaurantDetails = toDetails(restaurant);
+    restaurantDto.setRestaurantDetails(restaurantDetails);
+
+    return restaurantDto;
+  }
 }

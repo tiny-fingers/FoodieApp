@@ -23,7 +23,6 @@ import java.util.List;
 @RestController
 public class OrdersController {
   private final OrderService orderService;
-  private final RestaurantApiService restaurantApiService;
   private final RequestResponseMapper mapper;
 
   @GetMapping("/orders")

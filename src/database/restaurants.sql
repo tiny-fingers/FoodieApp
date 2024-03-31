@@ -1,0 +1,12 @@
+INSERT INTO restaurants (restaurant_name, restaurant_address, keyword) VALUES ('Mamma Mia', '123 Via Roma', 'italian,pasta,pizza');
+INSERT INTO restaurants (restaurant_name, restaurant_address, keyword) VALUES ('The French Bistro', '456 Rue de la Baguette', 'french, wine, cheese');
+INSERT INTO restaurants (restaurant_name, restaurant_address, keyword) VALUES ('Sushi Delight', '789 Sushi Street', 'sushi, seafood, japanese');
+INSERT INTO restaurants (restaurant_name, restaurant_address, keyword) VALUES ('The Vegan Haven', '1012 Plant-Based Boulevard', 'vegan, salads, grains');
+INSERT INTO restaurants (restaurant_name, restaurant_address, keyword) VALUES ('The BBQ Joint', '1314 Smokehouse Lane', 'bbq, meat, southern');
+INSERT INTO restaurants (restaurant_name, restaurant_address, keyword) VALUES ('The Italian Trattoria', '1516 Pasta Place', 'italian, pasta, wine');
+INSERT INTO restaurants (restaurant_name, restaurant_address, keyword) VALUES ('The Thai Kitchen', '1718 Spicy Street', 'thai, seafood, coconut');
+INSERT INTO restaurants (restaurant_name, restaurant_address, keyword) VALUES ('The Mexican Cantina', '1920 Taco Town', 'mexican, tacos, margaritas');
+INSERT INTO restaurants (restaurant_name, restaurant_address, keyword) VALUES ('The Indian Curry House', '2122 Spice Street', 'indian, curry, vegetarian');
+INSERT INTO restaurants (restaurant_name, restaurant_address, keyword) VALUES ('The Greek Taverna', '2324 Olive Street', 'greek, Mediterranean, wine');
+INSERT INTO restaurants (restaurant_name, restaurant_address, keyword) VALUES ('The Vegetarian Haven', '2526 Green Garden', 'vegetarian, salads, grains');
+INSERT INTO restaurants (restaurant_name, restaurant_address, keyword) VALUES ('The Sushi Palace', '2728 Sushi Avenue', 'sushi, seafood, japanese');
