@@ -12,15 +12,11 @@ import java.util.List;
 public class RestaurantService {
   private final RestaurantsRepository restaurantsRepository;
 
-  public String getRestaurantNameById(Long id) {
-    return "Demo Restaurant";
-  }
-
   public List<Restaurant> getRestaurants() {
     return restaurantsRepository.findAll();
   }
 
-  public List<Restaurant> findbyKeyword(List<String> keyword) {
+  public List<Restaurant> findByKeyword(List<String> keyword) {
     return restaurantsRepository.findAllWithKeyword(keyword);
   }
 

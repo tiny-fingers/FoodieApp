@@ -1,16 +1,23 @@
 package tinyfingers.simplilearn.foodieapp.service;
 
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.stereotype.Service;
+import tinyfingers.simplilearn.foodieapp.exception.ForbiddenOperationException;
+import tinyfingers.simplilearn.foodieapp.exception.InvalidOrder;
 import tinyfingers.simplilearn.foodieapp.exception.ResourceNotFoundException;
-import tinyfingers.simplilearn.foodieapp.mapper.OrderMapper;
+import tinyfingers.simplilearn.foodieapp.mapper.DomainApiMapper;
+import tinyfingers.simplilearn.foodieapp.mapper.DomainMapper;
 import tinyfingers.simplilearn.foodieapp.model.api.OrderAPI;
 import tinyfingers.simplilearn.foodieapp.model.domain.Order;
 import tinyfingers.simplilearn.foodieapp.model.domain.OrderStatus;
+import tinyfingers.simplilearn.foodieapp.repository.CartRepository;
 import tinyfingers.simplilearn.foodieapp.repository.OrderRepository;
+import tinyfingers.simplilearn.foodieapp.repository.RestaurantsRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,49 +25,65 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 public class OrderService {
-  private final OrderRepository orderRepository;
-  private final RestaurantService restaurantApiService;
-  private final OrderMapper mapper;
+  private final DomainApiMapper domainApiMapper;
+  private final DomainMapper domainMapper;
 
-  public Long createOrder(String userId, OrderAPI orderDto) {
-    val order = mapper.map(orderDto, userId);
-    log.info("Order created: {}", order);
-    return orderRepository.save(order).getId();
+  private final CartRepository cartRepository;
+  private final RestaurantsRepository restaurantsRepository;
+  private final OrderRepository orderRepository;
+
+  private final EntityManager entityManager;
+
+  public Order createOrder(Long cartId, String userId) {
+    val order = new Order();
+    order.setUserId(userId);
+
+    val cart = cartRepository
+            .findById(cartId)
+            .orElseThrow(() -> new InvalidOrder("Cart not found"));
+    val restaurant = restaurantsRepository.findById(cart.getRestaurant()
+            .getRestaurantId()).orElseThrow(() -> new InvalidOrder("Restaurant not found"));
+    order.setRestaurant(restaurant);
+
+    val orderItems = cart.getCartItems()
+            .stream()
+            .map(domainMapper::map)
+            .map(entityManager::merge)
+            .toList();
+
+    order.setOrderItems(orderItems);
+    order.setOrderDate(LocalDateTime.now());
+
+    return orderRepository.save(order);
   }
 
   public void cancelOrder(String userId, Long orderId) {
-    Order order = orderRepository.findById(orderId)
-            .orElseThrow(() -> new RuntimeException("Order not found"));
+    val order = orderRepository
+            .findById(orderId)
+            .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
+    if (!order.getUserId().equals(userId)) throw new ForbiddenOperationException("User not allowed to cancel order");
     order.setOrderStatus(OrderStatus.CANCELLED);
     orderRepository.save(order);
   }
 
   public OrderAPI updateOrderStatus(Long orderId, OrderStatus orderStatus) {
-    Order order = orderRepository.findById(orderId)
-            .orElseThrow(() -> new RuntimeException("Order not found"));
+    val order = orderRepository
+            .findById(orderId)
+            .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
     order.setOrderStatus(orderStatus);
-    return mapper.map(orderRepository.save(order));
+    return domainApiMapper.map(orderRepository.save(order));
   }
 
-  public List<OrderAPI> getOrderDtos() {
+  public List<OrderAPI> getOrders() {
     return orderRepository.findAll()
             .stream()
-            .map(order -> mapper.map(order, getRestaurantName(order)))
+            .map(domainApiMapper::map)
             .collect(Collectors.toList());
   }
 
-  public boolean isOrderValid(Long restaurantId, List<Long> sellableIds) {
-    return restaurantApiService.isSellableFromRestaurant(sellableIds, restaurantId);
-  }
-
-  public OrderAPI getOrderDto(Long orderId) {
-
+  public OrderAPI getOrder(Long orderId) {
     return orderRepository.findById(orderId)
-            .map(mapper::map)
+            .map(domainApiMapper::map)
             .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
-  }
-
-  private String getRestaurantName(Order order) {
-    return restaurantApiService.getRestaurantNameById(order.getRestaurantId());
   }
 }

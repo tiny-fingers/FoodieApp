@@ -26,7 +26,7 @@ import java.util.List;
 @Slf4j
 @CrossOrigin(value = "http://localhost:4200", allowCredentials = "true")
 public class RestaurantsController {
-  private final RestaurantService restaurantApiService;
+  private final RestaurantService restaurantService;
   private final RestaurantMapper mapper;
 
   @GetMapping("/restaurants")
@@ -35,7 +35,7 @@ public class RestaurantsController {
 
     log.info("getRestaurants");
 
-    List<RestaurantAPI> restaurants = restaurantApiService.getRestaurants()
+    List<RestaurantAPI> restaurants = restaurantService.getRestaurants()
             .stream()
             .map(mapper::toRestaurantDto)
             .toList();
@@ -44,7 +44,6 @@ public class RestaurantsController {
   }
 
   private ResponseEntity<List<RestaurantAPI>> getRestaurantsByKeyword(String searchTerm) {
-//    val keywords = searchTerm.split("\\s+");
     val keywords = searchTerm.split("\\s*,\\s*");
 
     log.info("getRestaurantsByKeyword for keywords: ");
@@ -53,21 +52,21 @@ public class RestaurantsController {
             .map(String::toString)
             .forEach(log::info);
 
-    val restaurants = restaurantApiService.findbyKeyword(List.of(keywords));
+    val restaurants = restaurantService.findByKeyword(List.of(keywords));
     val res = restaurants.stream().map(mapper::toRestaurantDto).toList();
     return ResponseEntity.ok(res);
   }
 
   @GetMapping("/restaurants/{id}/menu")
   public ResponseEntity<RestaurantMenuAPI> getRestaurantMenu(@PathVariable Long id) {
-    val res = restaurantApiService.getRestaurantById(id);
+    val res = restaurantService.getRestaurantById(id);
     if (res == null) return ResponseEntity.notFound().build();
     return ResponseEntity.ok(mapper.map(res));
   }
 
   @GetMapping("/restaurants/{id}/details")
   public ResponseEntity<RestaurantAPI.RestaurantDetails> getRestaurant(@PathVariable Long id) {
-    val res = restaurantApiService.getRestaurantById(id);
+    val res = restaurantService.getRestaurantById(id);
     if (res == null) return ResponseEntity.notFound().build();
     return ResponseEntity.ok(mapper.toDetails(res));
   }

@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import tinyfingers.simplilearn.foodieapp.exception.ForbiddenOperationException;
 import tinyfingers.simplilearn.foodieapp.exception.InvalidOrder;
 import tinyfingers.simplilearn.foodieapp.exception.ResourceNotFoundException;
 
@@ -24,4 +25,10 @@ public class GlobalExceptionHandler {
         return ex.getMessage();
     }
 
+    @ExceptionHandler(ForbiddenOperationException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ResponseBody
+    public String handleResourceNotFoundException(ForbiddenOperationException ex) {
+        return ex.getMessage();
+    }
 }

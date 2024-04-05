@@ -15,8 +15,9 @@ import tinyfingers.simplilearn.foodieapp.model.domain.Restaurant;
 @Mapper(componentModel = "spring")
 @Component
 public interface DomainApiMapper {
+  @Mapping(target = "restaurantName", source = "restaurant.restaurantName")
+  @Mapping(target = "restaurantId", source = "restaurant.restaurantId")
   OrderAPI map(Order order);
-  Order map(OrderAPI order);
   @Mapping(target = "restaurantId", source = "restaurant.restaurantId")
   @Mapping(target = "restaurantName", source = "restaurant.restaurantName")
   CartAPI map(Cart cart);
@@ -28,4 +29,16 @@ public interface DomainApiMapper {
   CartItem map(CartItemAPI cartItem);
   RestaurantAPI map(Restaurant restaurant);
   Restaurant map(RestaurantAPI restaurant);
+  @Mapping(target = "orderStatus", source = "orderStatus", defaultValue = "INITIATED")
+  Order map(OrderAPI orderDto);
+  default OrderAPI map(Order order, String restaurantName) {
+    OrderAPI orderDto = map(order);
+    orderDto.setRestaurantName(restaurantName);
+    return orderDto;
+  }
+  default Order map(OrderAPI orderDto, String userId) {
+    Order order = map(orderDto);
+    order.setUserId(userId);
+    return order;
+  }
 }
