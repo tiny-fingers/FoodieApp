@@ -1,19 +1,18 @@
 package tinyfingers.simplilearn.foodieapp.model.api;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
-@Data
+import java.math.BigDecimal;
+
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
-public class CartItem {
+@Data
+public class SellableAPI {
   private Long id;
-  private Integer quantity;
   private String name;
-  @JsonProperty("price")
-  private double unitPrice;
+  private String description;
+  private String sellableType;
+  private BigDecimal price;
 }

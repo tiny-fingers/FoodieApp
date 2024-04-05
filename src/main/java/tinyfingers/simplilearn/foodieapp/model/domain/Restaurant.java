@@ -1,4 +1,4 @@
-package tinyfingers.simplilearn.foodieapp.service.externalapi.model;
+package tinyfingers.simplilearn.foodieapp.model.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -11,9 +11,9 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
-import tinyfingers.simplilearn.foodieapp.model.util.CollectionToStringConverter;
+import tinyfingers.simplilearn.foodieapp.util.CollectionToStringConverter;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -25,6 +25,7 @@ import java.util.Set;
 @Data
 @Entity
 @Table(name =  "restaurants")
+@EqualsAndHashCode
 public class Restaurant {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

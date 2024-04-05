@@ -4,12 +4,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.stereotype.Service;
+import tinyfingers.simplilearn.foodieapp.exception.ResourceNotFoundException;
 import tinyfingers.simplilearn.foodieapp.mapper.OrderMapper;
-import tinyfingers.simplilearn.foodieapp.model.Order;
-import tinyfingers.simplilearn.foodieapp.model.api.OrderDto;
-import tinyfingers.simplilearn.foodieapp.model.api.OrderStatus;
+import tinyfingers.simplilearn.foodieapp.model.api.OrderAPI;
+import tinyfingers.simplilearn.foodieapp.model.domain.Order;
+import tinyfingers.simplilearn.foodieapp.model.domain.OrderStatus;
 import tinyfingers.simplilearn.foodieapp.repository.OrderRepository;
-import tinyfingers.simplilearn.foodieapp.service.externalapi.RestaurantApiService;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,10 +19,10 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class OrderService {
   private final OrderRepository orderRepository;
-  private final RestaurantApiService restaurantApiService;
+  private final RestaurantService restaurantApiService;
   private final OrderMapper mapper;
 
-  public Long createOrder(String userId, OrderDto orderDto) {
+  public Long createOrder(String userId, OrderAPI orderDto) {
     val order = mapper.map(orderDto, userId);
     log.info("Order created: {}", order);
     return orderRepository.save(order).getId();
@@ -35,18 +35,29 @@ public class OrderService {
     orderRepository.save(order);
   }
 
-  public OrderDto updateOrderStatus(Long orderId, OrderStatus orderStatus) {
+  public OrderAPI updateOrderStatus(Long orderId, OrderStatus orderStatus) {
     Order order = orderRepository.findById(orderId)
             .orElseThrow(() -> new RuntimeException("Order not found"));
     order.setOrderStatus(orderStatus);
     return mapper.map(orderRepository.save(order));
   }
 
-  public List<OrderDto> getOrderDtos() {
+  public List<OrderAPI> getOrderDtos() {
     return orderRepository.findAll()
             .stream()
             .map(order -> mapper.map(order, getRestaurantName(order)))
             .collect(Collectors.toList());
+  }
+
+  public boolean isOrderValid(Long restaurantId, List<Long> sellableIds) {
+    return restaurantApiService.isSellableFromRestaurant(sellableIds, restaurantId);
+  }
+
+  public OrderAPI getOrderDto(Long orderId) {
+
+    return orderRepository.findById(orderId)
+            .map(mapper::map)
+            .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
   }
 
   private String getRestaurantName(Order order) {

@@ -1,46 +1,95 @@
 package tinyfingers.simplilearn.foodieapp.controller;
 
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import tinyfingers.simplilearn.foodieapp.exception.ResourceNotFoundException;
-import tinyfingers.simplilearn.foodieapp.mapper.RequestResponseMapper;
+import tinyfingers.simplilearn.foodieapp.mapper.DomainMapper;
 import tinyfingers.simplilearn.foodieapp.model.api.CreateOrderRequest;
 import tinyfingers.simplilearn.foodieapp.model.api.CreateOrderResponse;
-import tinyfingers.simplilearn.foodieapp.model.api.OrderDto;
-import tinyfingers.simplilearn.foodieapp.model.api.OrderStatus;
+import tinyfingers.simplilearn.foodieapp.model.api.OrderAPI;
+import tinyfingers.simplilearn.foodieapp.model.domain.Order;
+import tinyfingers.simplilearn.foodieapp.model.domain.OrderStatus;
+import tinyfingers.simplilearn.foodieapp.repository.CartRepository;
+import tinyfingers.simplilearn.foodieapp.repository.OrderRepository;
 import tinyfingers.simplilearn.foodieapp.service.OrderService;
-import tinyfingers.simplilearn.foodieapp.service.externalapi.RestaurantApiService;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RequiredArgsConstructor
 @RequestMapping("/api")
 @Slf4j
 @RestController
+@CrossOrigin(value = "http://localhost:4200")
 public class OrdersController {
   private final OrderService orderService;
-  private final RequestResponseMapper mapper;
+  private final DomainMapper domainMapper;
+
+  private final CartRepository cartRepository;
+  private final OrderRepository orderRepository;
+
+  private final EntityManager entityManager;
 
   @GetMapping("/orders")
-  public ResponseEntity<List<OrderDto>> getAllOrders() {
+  public ResponseEntity<List<OrderAPI>> getAllOrders() {
     return ResponseEntity.ok(orderService.getOrderDtos());
   }
 
   @PostMapping("/orders")
-  public ResponseEntity<CreateOrderResponse> createOrder(@RequestParam String userId, @RequestBody CreateOrderRequest request) {
-    log.info("Creating order for user {} with order {}", userId, request);
+  @Transactional
+  public ResponseEntity<CreateOrderResponse> createOrder(@RequestBody CreateOrderRequest request) {
+    log.info("Creating order for userId {} and cart id {}", request.getUserId(), request.getCartId());
 
-    OrderDto orderDto = mapper.map(request);
+    val order = new Order();
+    order.setUserId(request.getUserId());
 
-    return ResponseEntity.ok(new CreateOrderResponse(orderService.createOrder(userId, orderDto)));
+    val cart = cartRepository.findById(request.getCartId())
+            .orElseThrow(() -> new ResourceNotFoundException("Cart not found"));
+    order.setRestaurantId(cart.getRestaurant().getRestaurantId());
+
+    val orderItems = cart.getCartItems()
+            .stream()
+            .map(domainMapper::map)
+            .map(entityManager::merge)
+            .toList();
+
+    order.setOrderItems(orderItems);
+    order.setOrderDate(LocalDateTime.now());
+
+    val orderId = orderRepository.save(order).getId();
+
+    val estimatedDeliveryTime = order.getOrderDate().plusMinutes(30);
+    val response = new CreateOrderResponse(orderId, order.getOrderStatus().name(), order.getOrderDate(), estimatedDeliveryTime);
+
+    cartRepository.deleteById(request.getCartId());
+
+    return ResponseEntity.ok(response);
+  }
+
+  @GetMapping("/orders/{orderId}")
+  public ResponseEntity<OrderAPI> getOrder(@PathVariable Long orderId) {
+    log.info("Retrieving order with id {}", orderId);
+
+    return ResponseEntity.ok(orderService.getOrderDto(orderId));
   }
 
   @PutMapping("/orders/{id}/updateStatus")
-  public ResponseEntity<OrderDto> updateOrderStatus(@PathVariable Long id, @RequestParam String status) {
+  public ResponseEntity<OrderAPI> updateOrderStatus(@PathVariable Long id, @RequestParam String status) {
     log.info("Updating order status for user {} with order {}", id, status);
     try {
       OrderStatus orderStatus = OrderStatus.valueOf(status);

@@ -1,15 +1,15 @@
-package tinyfingers.simplilearn.foodieapp.service.externalapi;
+package tinyfingers.simplilearn.foodieapp.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import tinyfingers.simplilearn.foodieapp.model.domain.Restaurant;
 import tinyfingers.simplilearn.foodieapp.repository.RestaurantsRepository;
-import tinyfingers.simplilearn.foodieapp.service.externalapi.model.Restaurant;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class RestaurantApiService {
+public class RestaurantService {
   private final RestaurantsRepository restaurantsRepository;
 
   public String getRestaurantNameById(Long id) {
@@ -27,4 +27,10 @@ public class RestaurantApiService {
   public Restaurant getRestaurantById(Long id) {
     return restaurantsRepository.findById(id).orElse(null);
   }
+
+  public boolean isSellableFromRestaurant(List<Long> sellableIds, Long restaurantId) {
+    return restaurantsRepository.doSellableBelongToRestaurant(sellableIds, restaurantId);
+  }
+
+
 }
