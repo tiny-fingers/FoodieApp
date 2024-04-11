@@ -27,10 +27,9 @@ pipeline {
         }
         stage('build docker images') {
             steps {
-                    sh 'docker build -t foodie-app:latest .'
+                    sh 'docker build --no-cache -t foodie-app:latest .'
                     sh 'docker tag foodie-app:latest tinyfingersdocker/foodie-app:latest'
-                    sh 'cd AppUi'
-                    sh 'docker build -t foodie-ui:latest .'
+                    sh 'docker build --no-cache -t foodie-ui:latest AppUi/Dockerfile'
                     sh 'docker tag foodie-ui:latest tinyfingersdocker/foodie-ui:latest'
             }
         }
