@@ -9,15 +9,18 @@ pipeline {
                 sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
             }
         }
-        stage('build docker') {
+        stage('build docker images') {
             steps {
                 sh 'docker build -t foodie-app .'
                 sh 'docker tag foodie-app:latest tinyfingersdocker/foodie-app:latest'
+                sh 'docker build -t foodie-ui / UI/FoodieAppUI/'
+                sh 'docker tag foodie-ui:latest tinyfingersdocker/foodie-ui:latest'
             }
         }
-        stage('Push image to dockerhub') {
+        stage('Push images to dockerhub') {
             steps {
                 sh 'docker push tinyfingersdocker/foodie-app:latest'
+                sh 'docker push tinyfingersdocker/foodie-ui:latest'
             }
         }
         stage ('Login to EC2') {
