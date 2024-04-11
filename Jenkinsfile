@@ -29,7 +29,8 @@ pipeline {
             steps {
                     sh 'docker build -t foodie-app .'
                     sh 'docker tag foodie-app:latest tinyfingersdocker/foodie-app:latest'
-                    sh 'docker build -t foodie-ui AppUi/'
+                    sh 'cd AppUi'
+                    sh 'docker build -t foodie-ui .'
                     sh 'docker tag foodie-ui:latest tinyfingersdocker/foodie-ui:latest'
             }
         }
