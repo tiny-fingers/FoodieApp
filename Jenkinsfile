@@ -32,12 +32,11 @@ pipeline {
                     sh 'docker tag foodie-app:latest tinyfingersdocker/foodie-app:latest'
                     sh 'docker tag foodie-ui:latest tinyfingersdocker/foodie-ui:latest'
                 }
+        stage('Push image to dockerhub') {
+            steps {
+                sh 'docker push tinyfingersdocker/foodie-app:latest'
             }
-            stage('Push image to dockerhub') {
-                steps {
-                    sh 'docker push tinyfingersdocker/foodie-app:latest'
-                }
-            }
+        }
         stage('Deploy server') {
             environment {
                 IMAGE_NAME='tinyfingersdocker/foodie-app:latest'
