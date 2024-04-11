@@ -28,31 +28,17 @@ pipeline {
         stage('build docker images') {
             steps {
                     sh 'docker build -t foodie-app .'
-                    sh 'docker build -t foodie-ui UI/FoodieAppUI/'
                     sh 'docker tag foodie-app:latest tinyfingersdocker/foodie-app:latest'
+                    sh 'docker build -t foodie-ui AppUI/'
                     sh 'docker tag foodie-ui:latest tinyfingersdocker/foodie-ui:latest'
             }
         }
         stage('Push image to dockerhub') {
             steps {
                 sh 'docker push tinyfingersdocker/foodie-app:latest'
+                sh 'docker push tinyfingersdocker/foodie-ui:latest'
             }
         }
-        stage('Deploy server') {
-            environment {
-                IMAGE_NAME='tinyfingersdocker/foodie-app:latest'
-                SSH_KEY = 'AWS_CREDENTIALS'
-                SSH_USER = 'ubuntu'
-                EC2_HOST = '16.16.232.87'
-                DATABASE_CREDENTIALS = credentials('DATABASE_CREDENTIALS')
-            }
-            steps {
-                sshagent([SSH_KEY]) {
-                    sh 'ssh ${SSH_USER}@${EC2_HOST} docker run -d -p "8090:8090" --network bridge -e SERVER_PORT=8090 -e CROSS_ORIGIN_URL=http://16.16.232.87:8000 -e DATABASE_USER=${DATABASE_CREDENTIALS_USR} -e DATABASE_PASSWORD=${DATABASE_CREDENTIALS_PSW} ${IMAGE_NAME}'
-                }
-            }
-        }
-
         stage('Deploy ui') {
             environment {
                 IMAGE_NAME='tinyfingersdocker/foodie-ui:latest'
@@ -65,6 +51,21 @@ pipeline {
             steps {
                 sshagent([SSH_KEY]) {
                     sh 'ssh ${SSH_USER}@${EC2_HOST} docker run -d -p "8000:80" --network bridge ${IMAGE_NAME}'
+                }
+            }
+        }
+        stage('Deploy server') {
+            environment {
+                IMAGE_NAME='tinyfingersdocker/foodie-app:latest'
+                ENV_FILE_LOCATION='.env'
+                SSH_KEY = 'AWS_CREDENTIALS'
+                SSH_USER = 'ubuntu'
+                EC2_HOST = '16.16.232.87'
+                DATABASE_CREDENTIALS = credentials('DATABASE_CREDENTIALS')
+            }
+            steps {
+                sshagent([SSH_KEY]) {
+                    sh 'ssh ${SSH_USER}@${EC2_HOST} docker run -d -p "8090:8090" --network bridge -e SERVER_PORT=8090 -e CROSS_ORIGIN_URL=http://16.16.232.87:8000 -e DATABASE_USER=${DATABASE_CREDENTIALS_USR} -e DATABASE_PASSWORD=${DATABASE_CREDENTIALS_PSW} ${IMAGE_NAME}'
                 }
             }
         }
