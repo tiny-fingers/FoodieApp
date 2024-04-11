@@ -29,7 +29,7 @@ pipeline {
             steps {
                     sh 'docker build --no-cache -t foodie-app:latest .'
                     sh 'docker tag foodie-app:latest tinyfingersdocker/foodie-app:latest'
-                    sh 'docker build --no-cache -t foodie-ui:latest AppUi/Dockerfile'
+                    sh 'docker build --no-cache -t foodie-ui:latest AppUi/'
                     sh 'docker tag foodie-ui:latest tinyfingersdocker/foodie-ui:latest'
             }
         }
