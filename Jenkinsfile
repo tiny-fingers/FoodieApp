@@ -27,10 +27,10 @@ pipeline {
         }
         stage('build docker images') {
             steps {
-                    sh 'docker build -t foodie-app .'
+                    sh 'docker build -t foodie-app:latest .'
                     sh 'docker tag foodie-app:latest tinyfingersdocker/foodie-app:latest'
                     sh 'cd AppUi'
-                    sh 'docker build -t foodie-ui .'
+                    sh 'docker build -t foodie-ui:latest .'
                     sh 'docker tag foodie-ui:latest tinyfingersdocker/foodie-ui:latest'
             }
         }
@@ -42,12 +42,10 @@ pipeline {
         }
         stage('Deploy ui') {
             environment {
-                IMAGE_NAME='tinyfingersdocker/foodie-ui:latest'
-                ENV_FILE_LOCATION='.env'
+                IMAGE_NAME = 'tinyfingersdocker/foodie-ui:latest'
                 SSH_KEY = 'AWS_CREDENTIALS'
                 SSH_USER = 'ubuntu'
                 EC2_HOST = '16.16.232.87'
-                DATABASE_CREDENTIALS = credentials('DATABASE_CREDENTIALS')
             }
             steps {
                 sshagent([SSH_KEY]) {
@@ -57,8 +55,7 @@ pipeline {
         }
         stage('Deploy server') {
             environment {
-                IMAGE_NAME='tinyfingersdocker/foodie-app:latest'
-                ENV_FILE_LOCATION='.env'
+                IMAGE_NAME = 'tinyfingersdocker/foodie-app:latest'
                 SSH_KEY = 'AWS_CREDENTIALS'
                 SSH_USER = 'ubuntu'
                 EC2_HOST = '16.16.232.87'
