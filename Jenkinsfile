@@ -31,7 +31,8 @@ pipeline {
                     sh 'docker build -t foodie-ui UI/FoodieAppUI/'
                     sh 'docker tag foodie-app:latest tinyfingersdocker/foodie-app:latest'
                     sh 'docker tag foodie-ui:latest tinyfingersdocker/foodie-ui:latest'
-                }
+            }
+        }
         stage('Push image to dockerhub') {
             steps {
                 sh 'docker push tinyfingersdocker/foodie-app:latest'
