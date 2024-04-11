@@ -1,0 +1,47 @@
+
+/* General styles for the search box container */
+.search-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 30px;
+  padding: 10px 15px;
+  width: 100%;
+  max-width: 50%;
+  margin: 0 auto;
+  font-size: 16px;
+}
+
+/* Styling for the input field */
+.search-box input {
+  flex-grow: 1;
+  border: none;
+  outline: none;
+  padding: 20px 20px;
+  font-size: 25px;
+  border-radius: 30px;
+  width: 100%;
+}
+
+/* Styling for the search button */
+.search-button {
+  background-color: #06C167; /* Uber green color for the button */
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 30px;
+  transition: background-color 0.3s ease;
+}
+
+.search-button:hover {
+  background-color: #059651; /* Slightly darker shade of Uber green for hover effect */
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 768px) {
+  .search-box {
+    padding: 10px;
+    max-width: 100%;
+  }
+}

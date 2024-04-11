@@ -1,0 +1,43 @@
+.flex-container {
+  margin: 5% 10%;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.flex-child {
+  flex: 3;
+  order: 2;
+}
+
+.menu {
+  flex: 7;
+  order: 1;
+  width: 80%;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.menu-item {
+  margin-bottom: 20px;
+}
+
+.menu-item h3 {
+  margin-bottom: 10px;
+}
+
+.add-to-cart-btn {
+  border: none;
+  padding: 12px 24px;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 12px;
+  transition: background-color 0.3s ease;
+}
+
+.add-to-cart-btn:hover {
+  background-color: limegreen;
+  color: black
+}

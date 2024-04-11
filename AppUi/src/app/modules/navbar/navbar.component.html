@@ -1,0 +1,13 @@
+<nav class="navbar">
+  <div class="navbar-logo" (click)="goTo('/')">
+    <img src="assets/logo.png" alt="foodie-logo"/>
+  </div>
+  <div class="navbar-links-group">
+    <ul class="navbar-links">
+      <li *ngIf="!isLoggedIn"><h5 (click)="login()">Login</h5></li>
+      <li *ngIf="isLoggedIn"><h5 (click)="logout()"><a href="/#">Logout</a></h5></li>
+      <li *ngIf="isLoggedIn"><h5 (click)="goTo('/orders')">My orders</h5></li>
+      <li><h5 (click)="goTo('/my-cart')">My cart</h5></li>
+    </ul>
+  </div>
+</nav>

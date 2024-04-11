@@ -1,0 +1,28 @@
+.container {
+  padding: 10%
+}
+.cancelled-order {
+  background-color: #f2f2f2;
+  color: #999;
+}
+
+.cancel-order-button {
+  /*color: black; !* White text *!*/
+  text-underline: #cc0000;
+  border: none; /* Remove border */
+  padding: 10px 10px; /* Add padding */
+  margin: 10px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: #cc0000;
+}
+
+.cancel-order-button:hover {
+  background-color: #cc0000;
+  font-weight: bold;
+  color: white;
+}

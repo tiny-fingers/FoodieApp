@@ -1,0 +1,12 @@
+
+<div class="flex-container">
+  <app-search-box class="search-box" (searchTerm)="searchRestaurants($event)"/>
+  <div class="flex-child">
+    <div class="restaurant-list">
+      <div class="restaurant" *ngFor="let restaurant of restaurants" [routerLink]="['/restaurants', restaurant.restaurantId, 'menu']">
+        <h3 (mouseover)="hover = true" (mouseout)="hover = false" [ngClass]="{'hover-effect': hover}">{{ restaurant.restaurantDetails.name }}</h3>
+        <p>{{ restaurant.restaurantDetails.restaurantAddress }}</p>
+      </div>
+    </div>
+  </div>
+</div>

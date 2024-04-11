@@ -1,0 +1,17 @@
+<div class="signup-container">
+  <form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
+    <div>
+      <label for="username">Username:</label>
+      <input type="text" id="username" formControlName="username">
+    </div>
+    <div>
+      <label for="password">Password:</label>
+      <input type="password" id="password" formControlName="password">
+    </div>
+    <div>
+      <label for="password">Repeat password:</label>
+      <input type="password" id="repeatedPassword" formControlName="repeatedPassword">
+    </div>
+    <button type="submit">Signup</button>
+  </form>
+</div>

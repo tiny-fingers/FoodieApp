@@ -1,0 +1,27 @@
+<div class="cart-container" *ngIf="cart.cartItems.length > 0">
+  <h2 class="restaurant-title" (click)="goToRestaurant(cart.restaurantId)" >Restaurant: {{cart.restaurantName}}</h2>
+  <div *ngFor="let item of cart.cartItems">
+    <div class="cart-item">
+      <div class="cart-item-description">
+        <h3>{{ item.name }}</h3>
+        <p>{{ item.unitPrice | currency:'USD':true:'1.2-2' }}</p>
+      </div>
+      <div class="quantity-controls">
+        <button class="item-counter" (click)="decrementQuantity(item.menuItemId)">-</button>
+        <span>{{ item.quantity }}</span>
+        <button class="item-counter"(click)="incrementQuantity(item.menuItemId)">+</button>
+      </div>
+    </div>
+  </div>
+  <div class="checkout-button-container">
+    <h3>Total: {{ cart.totalPrice | currency:'USD':true:'1.2-2' }}</h3>
+    <button class="checkout-button" (click)="handleCheckOut()">Checkout</button>
+  </div>
+</div>
+
+<div class="cart-container" *ngIf="cart.cartItems.length == 0">
+  <h1>Your cart is empty</h1>
+  <button class="go-to-restaurants-button" (click)="toHomepage()">To restaurants</button>
+</div>
+
+

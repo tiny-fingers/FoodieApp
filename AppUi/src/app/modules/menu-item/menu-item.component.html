@@ -1,0 +1,16 @@
+<div class="flex-container">
+
+  <div class="menu flex-child">
+    <div class="menu-item" *ngFor="let item of menuItems">
+      <h3>{{ item.name }}</h3>
+      <p>{{ item.description }}</p>
+      <p>{{ item.price }}</p>
+      <button class="add-to-cart-btn" (click)="addToCart(item)">Add to Cart</button>
+    </div>
+  </div>
+
+  <div class="flex-child">
+    <app-cart/>
+  </div>
+
+</div>

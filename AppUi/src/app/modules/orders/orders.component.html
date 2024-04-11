@@ -1,0 +1,22 @@
+<div class="container">
+  <div class="orders-list">
+    <table class="table">
+      <thead>
+      <tr>
+        <th>Restaurant</th>
+        <th>Order Status</th>
+        <th>Order date</th>
+        <th></th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let order of orders | statusSortedOrders" [class.cancelled-order]="order.orderStatus === 'CANCELLED'">
+        <td>{{ order.restaurantName }}</td>
+        <td>{{ order.orderStatus }}</td>
+        <td>{{ order.orderDate }}</td>
+        <td class="cancel-order-button" *ngIf="order.orderStatus !== 'CANCELLED'" (click)="cancelOrder(order.id)">Cancel</td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
