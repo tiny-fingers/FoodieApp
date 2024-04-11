@@ -5,8 +5,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @AllArgsConstructor
-@Data
 @NoArgsConstructor
-public class CreateOrderRequest {
-  private Long cartId;
+@Data
+public class CartInitRequest {
+  private Long restaurantId;
 }

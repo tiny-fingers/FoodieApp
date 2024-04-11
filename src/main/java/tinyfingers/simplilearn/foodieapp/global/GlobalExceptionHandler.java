@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import tinyfingers.simplilearn.foodieapp.exception.ForbiddenOperationException;
 import tinyfingers.simplilearn.foodieapp.exception.InvalidOrder;
+import tinyfingers.simplilearn.foodieapp.exception.InvalidUserException;
 import tinyfingers.simplilearn.foodieapp.exception.ResourceNotFoundException;
 
 @RestControllerAdvice
@@ -18,17 +19,23 @@ public class GlobalExceptionHandler {
         return ex.getMessage();
     }
 
-    @ExceptionHandler(InvalidOrder.class)
+    @ExceptionHandler({InvalidOrder.class, IllegalArgumentException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public String handleResourceNotFoundException(InvalidOrder ex) {
+    public String handleInvalidOrderException(InvalidOrder ex) {
         return ex.getMessage();
     }
 
     @ExceptionHandler(ForbiddenOperationException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
     @ResponseBody
-    public String handleResourceNotFoundException(ForbiddenOperationException ex) {
+    public String handleForbiddenOperationException(ForbiddenOperationException ex) {
+        return ex.getMessage();
+    }
+    @ExceptionHandler(InvalidUserException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ResponseBody
+    public String handleInvalidUserException(InvalidUserException ex) {
         return ex.getMessage();
     }
 }

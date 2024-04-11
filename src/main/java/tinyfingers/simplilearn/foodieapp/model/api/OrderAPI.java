@@ -22,6 +22,8 @@ public class OrderAPI {
   private long restaurantId;
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
   private LocalDateTime orderDate;
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
+  private LocalDateTime estimatedDeliveryTime;
   private OrderStatus orderStatus;
   private List<OrderItem> orderItems = new ArrayList<>();
 }

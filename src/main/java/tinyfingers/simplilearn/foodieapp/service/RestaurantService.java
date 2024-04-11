@@ -21,12 +21,8 @@ public class RestaurantService {
   }
 
   public Restaurant getRestaurantById(Long id) {
-    return restaurantsRepository.findById(id).orElse(null);
+    return restaurantsRepository
+            .findById(id)
+            .orElse(null);
   }
-
-  public boolean isSellableFromRestaurant(List<Long> sellableIds, Long restaurantId) {
-    return restaurantsRepository.doSellableBelongToRestaurant(sellableIds, restaurantId);
-  }
-
-
 }

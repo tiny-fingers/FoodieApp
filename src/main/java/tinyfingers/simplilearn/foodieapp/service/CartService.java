@@ -17,6 +17,8 @@ import tinyfingers.simplilearn.foodieapp.repository.SellableRepository;
 
 import java.util.List;
 
+import static io.micrometer.common.util.StringUtils.isBlank;
+
 @RequiredArgsConstructor
 @Slf4j
 @Service
@@ -47,7 +49,7 @@ public class CartService {
     cartRepository.deleteByUserIdOrSessionId(identifier);
   }
 
-  public Cart createCart(String identifier, CartAPI cartAPI) {
+  public CartAPI createCart(String identifier, CartAPI cartAPI) {
 
     val restaurantId = cartAPI.getRestaurantId();
     val sellables = sellableRepository.findAllByRestaurantId(restaurantId);
@@ -74,7 +76,28 @@ public class CartService {
     cart.setRestaurant(restaurantsRepository.findById(restaurantId).orElseThrow());
     cart.setCartItems(cartItems);
 
-    return cartRepository.save(cart);
+    val res = domainApiMapper.map(cartRepository.save(cart));
+    val totalPrice = calculateTotalPrice(res);
+    res.setTotalPrice(totalPrice);
+
+    return res;
+  }
+  
+  public CartAPI initCart(Long restaurantId, String userId, String sessionId) {
+    val cart = new Cart();
+    cart.setRestaurant(restaurantsRepository.getReferenceById(restaurantId));
+    cart.setSessionId(sessionId);
+    cart.setUserId(userId);
+
+    val identifier = isBlank(userId) ? sessionId : userId;
+    cartRepository.deleteByUserIdOrSessionId(identifier);
+
+    val cartAPI = domainApiMapper.map(cartRepository.save(cart));
+
+    val totalPrice = calculateTotalPrice(cartAPI);
+    cartAPI.setTotalPrice(totalPrice);
+
+    return cartAPI;
   }
 
   public void deleteCart(Long cartId) {

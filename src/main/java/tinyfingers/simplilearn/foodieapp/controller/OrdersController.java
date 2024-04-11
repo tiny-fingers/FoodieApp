@@ -5,8 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,22 +30,25 @@ import java.util.List;
 @RequestMapping("/api")
 @Slf4j
 @RestController
-@CrossOrigin(value = "http://localhost:4200")
 public class OrdersController {
   private final OrderService orderService;
   private final CartService cartService;
 
   @GetMapping("/orders")
   public ResponseEntity<List<OrderAPI>> getAllOrders() {
-    return ResponseEntity.ok(orderService.getOrders());
+    User principal = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    log.info("getAllOrders for user {}", principal.getUsername());
+
+    return ResponseEntity.ok(orderService.getOrders(principal.getUsername()));
   }
 
   @PostMapping("/orders")
   @Transactional
   public ResponseEntity<CreateOrderResponse> createOrder(@RequestBody CreateOrderRequest request) {
-    log.info("Creating order for userId {} and cart id {}", request.getUserId(), request.getCartId());
+    User principal = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    log.info("Creating order for userId {} and cart id {}", principal.getUsername(), request.getCartId());
 
-    val order = orderService.createOrder(request.getCartId(), request.getUserId());
+    val order = orderService.createOrder(request.getCartId(), principal.getUsername());
 
     val estimatedDeliveryTime = order.getOrderDate().plusMinutes(30);
     val response = new CreateOrderResponse(order.getId(), order.getOrderStatus().name(), order.getOrderDate(), estimatedDeliveryTime);
@@ -56,7 +60,8 @@ public class OrdersController {
 
   @GetMapping("/orders/{orderId}")
   public ResponseEntity<OrderAPI> getOrder(@PathVariable Long orderId) {
-    log.info("Retrieving order with id {}", orderId);
+    User principal = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    log.info("Retrieving order with id {} for username {}", orderId, principal.getUsername());
 
     return ResponseEntity.ok(orderService.getOrder(orderId));
   }
@@ -69,10 +74,12 @@ public class OrdersController {
     return ResponseEntity.ok(orderService.updateOrderStatus(id, orderStatus));
   }
 
-  @PutMapping("/orders/{id}/cancel")
+  @PostMapping("/orders/{id}")
   @ResponseStatus(HttpStatus.OK)
-  public void cancelOrder(@RequestParam String userId, @PathVariable Long id) {
-    log.info("Cancelling order {}", id);
-    orderService.cancelOrder(userId, id);
+  public void cancelOrder(@PathVariable Long id, @RequestParam("action") String action) {
+    User principal = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    log.info("Cancelling order with id {} for username {}", id, principal.getUsername());
+    if (action.equalsIgnoreCase("CANCEL")) orderService.cancelOrder(principal.getUsername(), id);
+    else throw new IllegalArgumentException();
   }
 }

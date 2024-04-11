@@ -1,64 +1,58 @@
 pipeline {
     agent any
-    environment {
-        DOCKERHUB_CREDENTIALS = credentials('DOCKERHUB_CREDENTIALS')
-     }
     stages {
+        stage ('Clean') {
+            environment {
+                SSH_KEY = 'AWS_CREDENTIALS'
+                SSH_USER = 'ubuntu'
+                EC2_HOST = '16.16.232.87'
+            }
+            steps {
+                sshagent([SSH_KEY]) {
+                    catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                        sh "ssh ${SSH_USER}@${EC2_HOST} 'docker stop \$(docker ps -a -q)'"
+                        sh "ssh ${SSH_USER}@${EC2_HOST} 'docker rm \$(docker ps -a -q)'"
+                        sh "ssh ${SSH_USER}@${EC2_HOST} 'docker rmi \$(docker images -a -q)'"
+                    }
+                }
+            }
+        }
         stage('Login to dockerhub') {
+            environment {
+                DOCKERHUB_CREDENTIALS = credentials('DOCKERHUB_CREDENTIALS')
+            }
             steps {
                 sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
             }
         }
-        stage('build docker') {
-            steps {
-                sh 'docker build -t foodie-app .'
-                sh 'docker tag foodie-app:latest tinyfingersdocker/foodie-app:latest'
-            }
-        }
-        stage('Push image to dockerhub') {
-            steps {
-                sh 'docker push tinyfingersdocker/foodie-app:latest'
-            }
-        }
-        stage ('Login to EC2') {
-            environment {
-                SSH_KEY = 'AWS_CREDENTIALS'
-                SSH_USER = 'ubuntu'
-                EC2_HOST = '52.47.159.117'
-            }
-            steps {
-                sshagent([SSH_KEY]) {
-                    sh "ssh ${SSH_USER}@${EC2_HOST} 'echo CONNECTED SUCCESS'"
-                }
-            }
-        }
-        stage('Deploy') {
+        stage('Deploy server') {
             environment {
                 IMAGE_NAME='tinyfingersdocker/foodie-app:latest'
                 ENV_FILE_LOCATION='.env'
                 SSH_KEY = 'AWS_CREDENTIALS'
                 SSH_USER = 'ubuntu'
-                EC2_HOST = '52.47.159.117'
+                EC2_HOST = '16.16.232.87'
+                DATABASE_CREDENTIALS = credentials('DATABASE_CREDENTIALS')
             }
             steps {
                 sshagent([SSH_KEY]) {
-                    sh 'ssh ${SSH_USER}@${EC2_HOST} docker pull ${IMAGE_NAME}'
-                    sh 'ssh ${SSH_USER}@${EC2_HOST} sh prep.sh'
-                    sh 'ssh ${SSH_USER}@${EC2_HOST} docker run --name foodie-app --env-file ${ENV_FILE_LOCATION} -p 8090:8090 -d ${IMAGE_NAME}'
+                    sh 'ssh ${SSH_USER}@${EC2_HOST} docker run -d -p "8090:8090" --network bridge -e SERVER_PORT=8090 -e CROSS_ORIGIN_URL=http://16.16.232.87:8000 -e DATABASE_USER=${DATABASE_CREDENTIALS_USR} -e DATABASE_PASSWORD=${DATABASE_CREDENTIALS_PSW} ${IMAGE_NAME}'
                 }
             }
         }
-        stage('Clean up') {
+
+        stage('Deploy ui') {
             environment {
+                IMAGE_NAME='tinyfingersdocker/foodie-ui:latest'
+                ENV_FILE_LOCATION='.env'
                 SSH_KEY = 'AWS_CREDENTIALS'
                 SSH_USER = 'ubuntu'
-                EC2_HOST = '52.47.159.117'
+                EC2_HOST = '16.16.232.87'
+                DATABASE_CREDENTIALS = credentials('DATABASE_CREDENTIALS')
             }
             steps {
                 sshagent([SSH_KEY]) {
-                    sh 'ssh ${SSH_USER}@${EC2_HOST} docker rm old-foodie-app 2> /dev/null'
-                    sh 'ssh ${SSH_USER}@${EC2_HOST} docker container prune -f'
-                    sh 'ssh ${SSH_USER}@${EC2_HOST} docker image prune -f'
+                    sh 'ssh ${SSH_USER}@${EC2_HOST} docker run -d -p "8000:80" --network bridge ${IMAGE_NAME}'
                 }
             }
         }

@@ -74,8 +74,8 @@ public class OrderService {
     return domainApiMapper.map(orderRepository.save(order));
   }
 
-  public List<OrderAPI> getOrders() {
-    return orderRepository.findAll()
+  public List<OrderAPI> getOrders(String userId) {
+    return orderRepository.findAllByUserId(userId)
             .stream()
             .map(domainApiMapper::map)
             .collect(Collectors.toList());
@@ -83,7 +83,11 @@ public class OrderService {
 
   public OrderAPI getOrder(Long orderId) {
     return orderRepository.findById(orderId)
-            .map(domainApiMapper::map)
+            .map(order -> {
+              OrderAPI orderAPI = domainApiMapper.map(order);
+              orderAPI.setEstimatedDeliveryTime(orderAPI.getOrderDate().plusMinutes(30));
+              return orderAPI;
+            })
             .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
   }
 }

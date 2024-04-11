@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,7 +28,6 @@ import java.util.List;
 @RequestMapping("/api")
 @Slf4j
 @RestController
-@CrossOrigin(value = "http://localhost:4200", allowCredentials = "true")
 public class CartController {
 
   private final DomainApiMapper domainApiMapper;
@@ -43,7 +41,6 @@ public class CartController {
     log.info("Get cart for userId {} and sessionId {}. Use identifier {} ", userId, session.getId(), identifier);
 
     return ResponseEntity.ok(cartService.getCart(identifier));
-
   }
 
   @GetMapping("/carts")
@@ -51,8 +48,15 @@ public class CartController {
     return ResponseEntity.ok(cartService.getCarts().stream().map(domainApiMapper::map).toList());
   }
 
+  @GetMapping("/cart/init")
+  public ResponseEntity<CartAPI> initCart(@RequestHeader("userId") @Nullable String userId, @RequestParam("restaurantId") Long restaurantId, HttpSession session) {
+    log.info("initCart for userId {} and sessionId {}", userId, session.getId());
+    return ResponseEntity.ok(cartService.initCart(restaurantId, userId, session.getId()));
+  }
+
   @PostMapping("/cart")
   public ResponseEntity<CartAPI> createCart(@RequestBody CartAPI cartAPI, @RequestParam @Nullable String userId, HttpSession session) {
+
     if (StringUtils.isBlank(userId)) {
       cartAPI.setSessionId(session.getId());
     } else {
@@ -60,9 +64,9 @@ public class CartController {
     }
     val identifier = StringUtils.isBlank(userId) ? session.getId() : userId;
 
-    val cart = cartService.createCart(identifier, cartAPI);
+    log.info("Create cart for userId {} and sessionId {}. Use identifier {} ", userId, session.getId(), identifier);
 
-    return ResponseEntity.ok(domainApiMapper.map(cart));
+    return ResponseEntity.ok(cartService.createCart(identifier, cartAPI));
   }
 
   @DeleteMapping("/carts")
