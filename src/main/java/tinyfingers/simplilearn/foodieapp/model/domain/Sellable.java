@@ -1,4 +1,4 @@
-package tinyfingers.simplilearn.foodieapp.service.externalapi.model;
+package tinyfingers.simplilearn.foodieapp.model.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -13,7 +13,7 @@ import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import tinyfingers.simplilearn.foodieapp.model.util.CollectionToStringConverter;
+import tinyfingers.simplilearn.foodieapp.util.CollectionToStringConverter;
 
 import java.math.BigDecimal;
 import java.util.HashSet;

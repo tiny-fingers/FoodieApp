@@ -3,27 +3,26 @@ package tinyfingers.simplilearn.foodieapp.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.stereotype.Component;
-import tinyfingers.simplilearn.foodieapp.model.api.RestaurantDetails;
-import tinyfingers.simplilearn.foodieapp.model.api.RestaurantDto;
-import tinyfingers.simplilearn.foodieapp.model.api.RestaurantMenu;
-import tinyfingers.simplilearn.foodieapp.service.externalapi.model.Restaurant;
+import tinyfingers.simplilearn.foodieapp.model.api.RestaurantAPI;
+import tinyfingers.simplilearn.foodieapp.model.api.RestaurantMenuAPI;
+import tinyfingers.simplilearn.foodieapp.model.domain.Restaurant;
 
 @Mapper(componentModel = "spring")
 @Component
 public interface RestaurantMapper {
   @Mapping(source = "sellable", target = "menu")
-  RestaurantMenu map(Restaurant restaurant);
+  RestaurantMenuAPI map(Restaurant restaurant);
 
   @Mapping(source = "restaurantName", target = "name")
-  RestaurantDetails toDetails(Restaurant restaurant);
+  RestaurantAPI.RestaurantDetails toDetails(Restaurant restaurant);
 
-  default RestaurantDto toRestaurantDto(Restaurant restaurant) {
-    RestaurantDto restaurantDto = new RestaurantDto();
+  default RestaurantAPI toRestaurantDto(Restaurant restaurant) {
+    RestaurantAPI restaurantDto = new RestaurantAPI();
     restaurantDto.setRestaurantId(restaurant.getRestaurantId());
 
     restaurantDto.setMenu(restaurant.getSellable());
 
-    RestaurantDetails restaurantDetails = toDetails(restaurant);
+    RestaurantAPI.RestaurantDetails restaurantDetails = toDetails(restaurant);
     restaurantDto.setRestaurantDetails(restaurantDetails);
 
     return restaurantDto;

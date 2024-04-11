@@ -4,9 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@AllArgsConstructor
 @Data
+@AllArgsConstructor
 @NoArgsConstructor
-public class CreateOrderRequest {
-  private Long cartId;
+public class CartItemAPI {
+  private Long menuItemId;
+  private Integer quantity;
+  private String name;
+  private double unitPrice;
 }

@@ -1,4 +1,4 @@
-package tinyfingers.simplilearn.foodieapp.model.api;
+package tinyfingers.simplilearn.foodieapp.model.domain;
 
 public enum OrderStatus {
   INITIATED,

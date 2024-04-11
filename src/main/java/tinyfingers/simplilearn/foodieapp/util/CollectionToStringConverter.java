@@ -1,4 +1,4 @@
-package tinyfingers.simplilearn.foodieapp.model.util;
+package tinyfingers.simplilearn.foodieapp.util;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;

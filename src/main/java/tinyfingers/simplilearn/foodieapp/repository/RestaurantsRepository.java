@@ -6,14 +6,15 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
-import tinyfingers.simplilearn.foodieapp.service.externalapi.model.Restaurant;
-import tinyfingers.simplilearn.foodieapp.service.externalapi.model.Sellable;
+import tinyfingers.simplilearn.foodieapp.model.domain.Restaurant;
+import tinyfingers.simplilearn.foodieapp.model.domain.Sellable;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Repository
 public interface RestaurantsRepository extends JpaRepository<Restaurant, Long>, JpaSpecificationExecutor<Restaurant> {
+
   default List<Restaurant> findAllWithKeyword(List<String> keywords) {
     return findAll((Specification<Restaurant>) (root, query, criteriaBuilder) -> {
       query.distinct(true);
